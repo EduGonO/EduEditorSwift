@@ -24,7 +24,7 @@ public struct EditorView: UIViewRepresentable {
     webView.navigationDelegate = context.coordinator
 
     // Load the local HTML
-    if let htmlURL = Bundle.module.url(forResource: "index", withExtension: "html", subdirectory: "EditorBundle") {
+    if let htmlURL = Bundle(for: BundleToken.self).url(forResource: "index", withExtension: "html", subdirectory: "EduEditorSwift_EduEditorSwift.bundle/EditorBundle") {
       webView.loadFileURL(htmlURL, allowingReadAccessTo: htmlURL.deletingLastPathComponent())
     }
 
@@ -58,3 +58,5 @@ public struct EditorView: UIViewRepresentable {
     }
   }
 }
+
+private class BundleToken {}
