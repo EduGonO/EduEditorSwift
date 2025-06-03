@@ -23,43 +23,32 @@ public struct EditorView: UIViewRepresentable {
     let webView = WKWebView(frame: .zero, configuration: webConfig)
     webView.navigationDelegate = context.coordinator
 
-    // 1. Try loading via Bundle(for:)
-    if let bundleURL = Bundle(for: BundleToken.self).url(
-        forResource: "index",
-        withExtension: "html",
-        subdirectory: "EditorBundle"
-    ) {
-        print("✅ Found index.html at:", bundleURL.path)
-        webView.loadFileURL(bundleURL, allowingReadAccessTo: bundleURL.deletingLastPathComponent())
-    }
-    else if let mainURL = Bundle.main.url(
-        forResource: "index",
-        withExtension: "html",
-        subdirectory: "EditorBundle"
-    ) {
-        print("ℹ️ Fallback: found index.html in main bundle at:", mainURL.path)
-        webView.loadFileURL(mainURL, allowingReadAccessTo: mainURL.deletingLastPathComponent())
-    }
-    else {
-        print("❌ index.html not found in any bundle. List bundle paths:")
-        print("Bundle(for: BundleToken).bundlePath:", Bundle(for: BundleToken.self).bundlePath)
+    // Attempt to load index.html from Resources/ directly (no subfolder).
+    if let htmlURL = Bundle.main.url(forResource: "index", withExtension: "html") {
+        print("✅ Found1 index.html at:", htmlURL.path)
+        webView.loadFileURL(
+            htmlURL,
+            allowingReadAccessTo: htmlURL.deletingLastPathComponent()
+        )
+    } else {
+        print("❌ 1index.html not found in Bundle.main. Check that index.html is in Resources/")
         print("Bundle.main.bundlePath:", Bundle.main.bundlePath)
     }
 
-    // 2. Observe toolbar actions and dispatch JS
+    // Observe toolbarActions and run JS
     toolbarActions
-        .sink { script in
-            print("🛠 Executing JS:", script)
-            webView.evaluateJavaScript(script, completionHandler: { result, error in
-                if let err = error {
-                    print("❗️ JS error:", err.localizedDescription)
-                }
-            })
+      .sink { script in
+        print("🛠 Executing JS:", script)
+        webView.evaluateJavaScript(script) { result, error in
+            if let err = error {
+                print("❗️ JS error:", err.localizedDescription)
+            }
         }
-        .store(in: &context.coordinator.cancellables)
+      }
+      .store(in: &context.coordinator.cancellables)
 
     return webView
-  }
+}
 
   public func updateUIView(_ webView: WKWebView, context: Context) {
     // Nothing to update; editor lives in JS.
