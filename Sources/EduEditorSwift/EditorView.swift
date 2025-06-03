@@ -25,6 +25,7 @@ public struct EditorView: UIViewRepresentable {
 
     // Load the local HTML
     if let htmlURL = Bundle(for: BundleToken.self).url(forResource: "index", withExtension: "html", subdirectory: "EduEditorSwift_EduEditorSwift.bundle/EditorBundle") {
+      print("HTML path:", htmlURL.path)
       webView.loadFileURL(htmlURL, allowingReadAccessTo: htmlURL.deletingLastPathComponent())
     }
 
