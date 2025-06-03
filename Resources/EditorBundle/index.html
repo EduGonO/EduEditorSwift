@@ -3,51 +3,97 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EduEditor</title>
+    <title>EduEditor (Debug)</title>
     <link
       href="https://unpkg.com/tailwindcss@^3/dist/tailwind.min.css"
       rel="stylesheet"
     />
   </head>
   <body class="bg-gray-50">
-  <!-- Visual sanity check: -->
-  <h1 style="color:red; text-align:center; margin-top:20px;">
-    🔴 INDEX.HTML LOADED
-  </h1>
+    <!-- Stage 0: HTML is in the DOM -->
+    <h1 style="color:red; text-align:center; margin-top:20px;">
+      1NDEX.HTML LOADED
+    </h1>
 
-  <div id="editor-root" class="p-4"></div>
+    <!-- Stage 1: we’ll immediately overwrite this text if the first script runs -->
+    <p id="stage1" style="color:blue; text-align:center;">
+      Stage 1: waiting for script…
+    </p>
 
-  <!-- error/listener scripts: -->
-  <script>
-    window.addEventListener("error", (e) => {
-      console.error("⛔️ JS error in WebView:", e.message);
-    });
-    window.addEventListener("unhandledrejection", (e) => {
-      console.error("⛔️ Promise rejection:", e.reason);
-    });
-    console.log("ℹ️ index.html loaded");
-  </script>
+    <div id="editor-root" class="p-4"></div>
 
-  <!-- bundle and init: -->
-  <script src="edu-editor.bundle.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      console.log("DOM fully loaded");
-      if (typeof EduEditorBundle === "undefined") {
-        console.error("❌ EduEditorBundle is undefined");
-        return;
-      }
-      if (typeof EduEditorBundle.initEduEditor !== "function") {
-        console.error("❌ initEduEditor is not a function on EduEditorBundle");
-        return;
+    <!-- ▶️ Script A: change #stage1 and append the bundle -->
+    <script>
+      // Immediately mark Stage 1
+      const stage1 = document.getElementById("stage1");
+      if (stage1) {
+        stage1.textContent = "Stage 1: appending bundle script…";
+      } else {
+        document.body.insertAdjacentHTML(
+          "beforeend",
+          '<p style="color:red; text-align:center;">❌ Could not find #stage1 element</p>'
+        );
       }
 
-      console.log("Calling initEduEditor");
-      EduEditorBundle.initEduEditor({
-        rootId: "editor-root",
-        initialContent: { type: "doc", content: [] },
+      // Create a <script> tag for the bundle
+      const s = document.createElement("script");
+      s.src = "edu-editor.bundle.js";
+      s.onload = () => {
+        document.body.insertAdjacentHTML(
+          "beforeend",
+          '<p id="stage2" style="color:green; text-align:center;">Stage 2: bundle script loaded</p>'
+        );
+      };
+      s.onerror = () => {
+        document.body.insertAdjacentHTML(
+          "beforeend",
+          '<p style="color:red; text-align:center;">❌ Failed to load edu-editor.bundle.js</p>'
+        );
+      };
+      // Append to <head> so it executes
+      document.head.appendChild(s);
+    </script>
+
+    <!-- ▶️ Script B: run on DOMContentLoaded and try to init the editor -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        document.body.insertAdjacentHTML(
+          "beforeend",
+          '<p id="stage3" style="color:purple; text-align:center;">Stage 3: DOMContentLoaded</p>'
+        );
+
+        // Check for the global bundle object
+        if (typeof EduEditorBundle === "undefined") {
+          document.body.insertAdjacentHTML(
+            "beforeend",
+            '<p style="color:red; text-align:center;">❌ EduEditorBundle is undefined</p>'
+          );
+          return;
+        }
+        if (typeof EduEditorBundle.initEduEditor !== "function") {
+          document.body.insertAdjacentHTML(
+            "beforeend",
+            '<p style="color:red; text-align:center;">❌ initEduEditor is not a function</p>'
+          );
+          return;
+        }
+
+        // Mark Stage 4 and call the initializer
+        document.body.insertAdjacentHTML(
+          "beforeend",
+          '<p id="stage4" style="color:teal; text-align:center;">Stage 4: calling initEduEditor</p>'
+        );
+        EduEditorBundle.initEduEditor({
+          rootId: "editor-root",
+          initialContent: { type: "doc", content: [] },
+        });
+
+        // Immediately mark Stage 5
+        document.body.insertAdjacentHTML(
+          "beforeend",
+          '<p id="stage5" style="color:darkgreen; text-align:center;">Stage 5: initEduEditor() called</p>'
+        );
       });
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>
