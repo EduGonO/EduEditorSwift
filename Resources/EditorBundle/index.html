@@ -10,26 +10,44 @@
     />
   </head>
   <body class="bg-gray-50">
-    <div id="editor-root" class="p-4"></div>
-    <script src="edu-editor.bundle.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        console.log("DOM fully loaded");
-        if (typeof EduEditorBundle === "undefined") {
-          console.error("EduEditorBundle is undefined");
-          return;
-        }
-        if (typeof EduEditorBundle.initEduEditor !== "function") {
-          console.error("initEduEditor is not a function on EduEditorBundle");
-          return;
-        }
+  <!-- Visual sanity check: -->
+  <h1 style="color:red; text-align:center; margin-top:20px;">
+    🔴 INDEX.HTML LOADED
+  </h1>
 
-        console.log("Calling initEduEditor");
-        EduEditorBundle.initEduEditor({
-          rootId: "editor-root",
-          initialContent: { type: "doc", content: [] },
-        });
+  <div id="editor-root" class="p-4"></div>
+
+  <!-- error/listener scripts: -->
+  <script>
+    window.addEventListener("error", (e) => {
+      console.error("⛔️ JS error in WebView:", e.message);
+    });
+    window.addEventListener("unhandledrejection", (e) => {
+      console.error("⛔️ Promise rejection:", e.reason);
+    });
+    console.log("ℹ️ index.html loaded");
+  </script>
+
+  <!-- bundle and init: -->
+  <script src="edu-editor.bundle.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("DOM fully loaded");
+      if (typeof EduEditorBundle === "undefined") {
+        console.error("❌ EduEditorBundle is undefined");
+        return;
+      }
+      if (typeof EduEditorBundle.initEduEditor !== "function") {
+        console.error("❌ initEduEditor is not a function on EduEditorBundle");
+        return;
+      }
+
+      console.log("Calling initEduEditor");
+      EduEditorBundle.initEduEditor({
+        rootId: "editor-root",
+        initialContent: { type: "doc", content: [] },
       });
-    </script>
-  </body>
+    });
+  </script>
+</body>
 </html>
