@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduEditor</title>
+    <link
+      href="https://unpkg.com/tailwindcss@^3/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-50">
+    <div id="editor-root" class="p-4"></div>
+    <script src="edu-editor.bundle.js"></script>
+    <script>
+      // Assuming your Rollup bundle exposes a global initEduEditor()
+      document.addEventListener("DOMContentLoaded", () => {
+        EduEditorBundle.initEduEditor({
+          rootId: "editor-root",
+          initialContent: { type: "doc", content: [] },
+        });
+      });
+    </script>
+  </body>
+</html>
